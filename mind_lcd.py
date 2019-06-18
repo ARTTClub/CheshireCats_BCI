@@ -27,13 +27,17 @@ E_DELAY = 0.00005
 
 def main():
     
-    #print ("Average Size")
+    #Take user input for number of readings per output
     avgSize =0
     while avgSize <=0:
         text = raw_input("Average Size = ")
         avgSize = int(text)
+    
+    #inititalize lcd display
     lcd_init()
     GPIO.setup(17,GPIO.OUT)
+    
+    #connect headset to Rpi
     headset = mindwave.Headset('/dev/ttyUSB0', 'DB00')
     time.sleep(2)
 
@@ -49,7 +53,7 @@ def main():
     time.sleep(1)
         
     previous = 0   
-      
+    #selecting options from menu  
     arr = ['Attention', 'Meditation', 'Blink']
     i = 0
     j = 1
@@ -66,6 +70,7 @@ def main():
     lcd_string(arr[j],2)
     while True:
         #print "Attention: %s, Meditation: %s, previous: %s" % (headset.attention, headset.meditation,previous)
+        #scroll through options on the menu
         if GPIO.input(15)== GPIO.HIGH:
             print('Scrolling--------')
             
@@ -78,7 +83,7 @@ def main():
             while GPIO.input(15)== GPIO.HIGH:
                 pass
     ##      lcd.GPIO.cleanup()
-              
+        #select option
         if GPIO.input(14)== GPIO.HIGH:
             
             selected = arr[i]
@@ -88,6 +93,7 @@ def main():
             p = False
             prevAvg=0
             count = 1
+            #if attention is selected
             if i==0:
                 lcd_byte(LCD_LINE_1, LCD_CMD)
                 lcd_string("Sel. Attention ",2)
@@ -114,6 +120,7 @@ def main():
                         previous = []
                         count = 1
                         print "Attention: %s" % Avg
+                        #switch light state if avg is more than 50 and prev is less than 50
                         if Avg >= 50 and prevAvg < 50:
                             if lightswitch == False :
                                 GPIO.output(17,GPIO.HIGH)
@@ -125,6 +132,7 @@ def main():
                         lcd_byte(LCD_LINE_2, LCD_CMD)
                         lcd_string(str(Avg),2)                      
                     time.sleep(1)
+            #if meditation is selected
             if i ==1:
                 lcd_byte(LCD_LINE_1, LCD_CMD)
                 lcd_string("Sel. Meditation ",2)
@@ -151,6 +159,7 @@ def main():
                         previous = []
                         count = 1
                         print "Meditation: %s" % Avg
+                        #switch light state if avg is more than 50 and prev is less than 50
                         if Avg >= 50 and prevAvg < 50:
                             if lightswitch == False :
                                 GPIO.output(17,GPIO.HIGH)
@@ -162,7 +171,8 @@ def main():
                         lcd_byte(LCD_LINE_2, LCD_CMD)
                         lcd_string(str(Avg),2)                      
                     time.sleep(1)
-                 
+            #if blink is selected
+            #blink doesnt work yet
             if i == 2:
                 print('WORK IN PROGRESS')
             lcd_byte(LCD_LINE_1, LCD_CMD)
@@ -173,7 +183,7 @@ def main():
             while GPIO.input(14)== GPIO.HIGH:
                 pass
         
-
+#initialization stuff
 def lcd_init():
   GPIO.setmode(GPIO.BCM)       # Use BCM GPIO numbers
   GPIO.setup(LCD_E, GPIO.OUT)  # E
