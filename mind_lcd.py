@@ -26,6 +26,12 @@ E_PULSE = 0.00005
 E_DELAY = 0.00005
 
 def main():
+    
+    #print ("Average Size")
+    avgSize =0
+    while avgSize <=0:
+        text = raw_input("Average Size = ")
+        avgSize = int(text)
     lcd_init()
     GPIO.setup(17,GPIO.OUT)
     headset = mindwave.Headset('/dev/ttyUSB0', 'DB00')
@@ -78,9 +84,10 @@ def main():
             selected = arr[i]
             print ("Selected " + selected)
             lightswitch = False
-            previous = 0
+            previous = []
             p = False
             prevAvg=0
+            count = 1
             if i==0:
                 lcd_byte(LCD_LINE_1, LCD_CMD)
                 lcd_string("Sel. Attention ",2)
@@ -88,12 +95,24 @@ def main():
                 while True:                    
                     if GPIO.input(14)==GPIO.HIGH:
                         break
-                    if p == False:
-                        p = True
-                        previous = headset.attention
+                    if count < avgSize:
+                        count+=1
+                        previous.append(headset.attention)
+                        #for x in range(len(previous)): 
+                         #   print previous[x]
                     else:
-                        p = False
-                        Avg = (headset.attention+previous)/2
+                        #p = False
+                        previous.append(headset.attention)
+                        for x in range(len(previous)): 
+                            print previous[x]
+                        k = 0
+                        sum = 0
+                        while k < avgSize:
+                            sum += previous[k]
+                            k+=1
+                        Avg = sum/len(previous)
+                        previous = []
+                        count = 1
                         print "Attention: %s" % Avg
                         if Avg >= 50 and prevAvg < 50:
                             if lightswitch == False :
