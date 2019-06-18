@@ -1,7 +1,7 @@
 #import
 import mindwave, time
 import RPi.GPIO as GPIO
-
+#GOTTA COMMENT
 GPIO.setwarnings(False) # Ignore warning for now
 
 # Define GPIO to LCD mapping
