@@ -103,8 +103,8 @@ def main():
                     else:
                         #p = False
                         previous.append(headset.attention)
-                        for x in range(len(previous)): 
-                            print previous[x]
+                        #for x in range(len(previous)): 
+                        #    print previous[x]
                         k = 0
                         sum = 0
                         while k < avgSize:
@@ -127,17 +127,29 @@ def main():
                     time.sleep(1)
             if i ==1:
                 lcd_byte(LCD_LINE_1, LCD_CMD)
-                lcd_string("Sel. Meditation",2)
+                lcd_string("Sel. Meditation ",2)
                 time.sleep(1)
                 while True:                    
                     if GPIO.input(14)==GPIO.HIGH:
                         break
-                    if p == False:
-                        p = True
-                        previous = headset.attention
+                    if count < avgSize:
+                        count+=1
+                        previous.append(headset.meditation)
+                        #for x in range(len(previous)): 
+                         #   print previous[x]
                     else:
-                        p = False
-                        Avg = (headset.attention+previous)/2
+                        #p = False
+                        previous.append(headset.meditation)
+                        #for x in range(len(previous)): 
+                        #    print previous[x]
+                        k = 0
+                        sum = 0
+                        while k < avgSize:
+                            sum += previous[k]
+                            k+=1
+                        Avg = sum/len(previous)
+                        previous = []
+                        count = 1
                         print "Meditation: %s" % Avg
                         if Avg >= 50 and prevAvg < 50:
                             if lightswitch == False :
@@ -149,7 +161,8 @@ def main():
                         prevAvg = Avg
                         lcd_byte(LCD_LINE_2, LCD_CMD)
                         lcd_string(str(Avg),2)                      
-                    time.sleep(1)    
+                    time.sleep(1)
+                 
             if i == 2:
                 print('WORK IN PROGRESS')
             lcd_byte(LCD_LINE_1, LCD_CMD)
