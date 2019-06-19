@@ -27,16 +27,14 @@ E_DELAY = 0.00005
 
 def main():
     
-    #Take user input for number of readings per output
-    avgSize =0
-    while avgSize <=0:
-        text = raw_input("Average Size = ")
-        avgSize = int(text)
     
     #inititalize lcd display
     lcd_init()
-    GPIO.setup(17,GPIO.OUT)
-    
+    GPIO.setup(23,GPIO.OUT)
+    GPIO.setup(12,GPIO.OUT)
+    GPIO.output(12,GPIO.HIGH)
+    GPIO.output(23,GPIO.HIGH)
+
     #connect headset to Rpi
     headset = mindwave.Headset('/dev/ttyUSB0', 'DB00')
     time.sleep(2)
@@ -95,6 +93,23 @@ def main():
             count = 1
             #if attention is selected
             if i==0:
+                time.sleep(1)
+                lcd_byte(LCD_LINE_2, LCD_CMD)
+                lcd_string("Type end to Cont",2)
+                #Take user input for number of readings per output
+                avgSize =4
+                while True:
+                    lcd_byte(LCD_LINE_1, LCD_CMD)
+                    question = "Average Size: "+str(avgSize)
+                    lcd_string(question,2)
+                    text = raw_input("Average Size = ")
+                    if text == "end":
+                        break
+                    avgSize = int(text)
+                    
+                    
+                    
+
                 lcd_byte(LCD_LINE_1, LCD_CMD)
                 lcd_string("Sel. Attention ",2)
                 time.sleep(1)
