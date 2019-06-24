@@ -17,8 +17,10 @@ Put on the headset and switch it on
 Open the terminal
 
 Type the following commands: 
+	
 	cd ChesireCats_BCI
-  python mind_LCD.py
+  
+	python mind_LCD.py
 
 Select a mode using the Raspberry Pi buttons
 
