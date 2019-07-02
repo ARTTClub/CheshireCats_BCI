@@ -46,8 +46,21 @@ If LED not working pull out and make sure longer leg is connected to positive. S
 If circuit is not working make sure correct pins are connected. Also check if resistors are correct value. Replace resistors if circuit still does not work.
 
 If the headset does not connect after a few attempts, turn it switch it off and on and try restarting the program 
-<<<<<<< HEAD
-=======
 
---------------------------------------------------------------------------------------------------------------------------
->>>>>>> 2e6fe5603f5e04b6b12dc882833364723fd8fc37
+# LIFX Lightbulb Control w/ Headset
+
+Put on the headset and switch it on
+
+Open the terminal
+
+Type the following commands: 
+	
+	cd CheshireCats_BCI
+  
+	python mind_bulb.py
+
+Select a meditation using the Raspberry Pi buttons
+
+Enter a number to choose as an average
+
+Observe the lamp
