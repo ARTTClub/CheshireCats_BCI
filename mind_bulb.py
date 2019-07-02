@@ -1,6 +1,14 @@
 #import
 import mindwave, time
 import RPi.GPIO as GPIO
+
+import sys
+from copy import copy
+#from time import sleep, time
+
+from lifxlan import LifxLAN
+
+
 #GOTTA COMMENT
 GPIO.setwarnings(False) # Ignore warning for now
 
@@ -27,7 +35,28 @@ E_DELAY = 0.00005
 
 
 def main():
-    
+    num_lights = None
+    if len(sys.argv) != 2:
+        print("\nDiscovery will go much faster if you provide the number of lights on your LAN:")
+        print("  python {} <number of lights on LAN>\n".format(sys.argv[0]))
+    else:
+        num_lights = int(sys.argv[1])
+
+    # instantiate LifxLAN client, num_lights may be None (unknown).
+    # In fact, you don't need to provide LifxLAN with the number of bulbs at all.
+    # lifx = LifxLAN() works just as well. Knowing the number of bulbs in advance
+    # simply makes initial bulb discovery faster.
+    lifx = LifxLAN(num_lights)
+
+    # test power control
+    print("Discovering lights...")
+    original_powers = lifx.get_power_all_lights()
+    original_colors = lifx.get_color_all_lights()
+
+    half_period_ms = 2500
+    duration_mins = 20
+    duration_secs = duration_mins*60
+    print("Breathing...")
     
     #inititalize lcd display
     lcd_init()
@@ -188,9 +217,17 @@ def main():
                             sum += previous[k]
                             k+=1
                         Avg = sum/len(previous)
+                        #print original_colors
+                        for bulb in original_colors:
+                            color = original_colors[bulb]
+                            dim = list(copy(color))
+                            dim[2] = 655*Avg
+                            #print "changing bulb to %s" % dim[2]
+                            bulb.set_color(dim, half_period_ms, rapid=True)
+                        #time.sleep(half_period_ms/1000.0)
                         previous = []
                         count = 0
-                        print "Meditation: %s" % Avg
+                        print "Meditation: %s changing bulb to %s" % (Avg,dim[2])
                         #switch light state if avg is more than 50 and prev is less than 50
                         if Avg >= 50 and prevAvg < 50:
                             if lightswitch == False :
@@ -305,5 +342,6 @@ def lcd_byte(bits, mode):
 
 if __name__ == '__main__':
   main()
+
 
 
