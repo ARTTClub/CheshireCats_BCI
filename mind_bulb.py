@@ -81,7 +81,15 @@ def main():
             print "Retrying connect..."
     print "Connected."
     time.sleep(1)
-        
+    # dims bulb completely at beginning
+    # brightness in range [0 - 65535]
+    # set_color is [Hue, Saturation, Brightness, Kelvin], duration in ms
+    for bulb in original_colors:
+        color = original_colors[bulb]
+        dim = list(copy(color))
+        dim[2] = 0
+        #print "changing bulb to %s" % dim[2]
+        bulb.set_color(dim, half_period_ms, rapid=True)    
     previous = 0   
     #selecting options from menu  
     arr = ['Attention', 'Meditation', 'Blink']
@@ -218,10 +226,13 @@ def main():
                             k+=1
                         Avg = sum/len(previous)
                         #print original_colors
+                        # max brightness of bulb goes from 0 to 65535 based on reverse of Avg. So closer to max meditation means dimmer bulb.
+                        # brightness in range [0 - 65535]
+                        # set_color is [Hue, Saturation, Brightness, Kelvin], duration in ms
                         for bulb in original_colors:
                             color = original_colors[bulb]
                             dim = list(copy(color))
-                            dim[2] = 655*Avg
+                            dim[2] = 655*(100-Avg)
                             #print "changing bulb to %s" % dim[2]
                             bulb.set_color(dim, half_period_ms, rapid=True)
                         #time.sleep(half_period_ms/1000.0)
