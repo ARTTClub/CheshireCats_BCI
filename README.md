@@ -46,3 +46,5 @@ If LED not working pull out and make sure longer leg is connected to positive. S
 If circuit is not working make sure correct pins are connected. Also check if resistors are correct value. Replace resistors if circuit still does not work.
 
 If the headset does not connect after a few attempts, turn it switch it off and on and try restarting the program 
+
+--------------------------------------------------------------------------------------------------------------------------
