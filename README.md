@@ -10,7 +10,7 @@ Plug a keyboard and mouse into the USB ports of the Raspberry Pi
 
 Plug in Mindwave USB dongle into Raspberry Pi
 
-# Putting on Headset
+# BCI to LCD/LED
 
 Put on headset so that the bar which can be pulled down is touching center of forehead.
 
