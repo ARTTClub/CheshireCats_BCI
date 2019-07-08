@@ -23,17 +23,12 @@ print "Connected."
 
 lightswitch = False
 previous = 0
-p = false
+#p = False
 while True:
     time.sleep(1)
-    
-    
-    if headset.attention >= 50 and previous < 50 :
-        if p ==False:
-            p = True
-        else:
-            p = False
-            print "Attention: %s" % ((headset.attention+previous)/2)
+    curr= headset.attention
+    print "Attention: %s" % (curr)    
+    if curr >= 50 and previous < 50 :
         if lightswitch == False :
             GPIO.output(17,GPIO.HIGH)
             time.sleep(1)
@@ -42,7 +37,7 @@ while True:
             GPIO.output(17,GPIO.LOW)
             time.sleep(1)
             lightswitch = False
-    previous = headset.attention    
+    previous = curr    
     
 
 
