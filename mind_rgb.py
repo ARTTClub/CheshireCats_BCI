@@ -91,180 +91,72 @@ def main():
         dim[0]=62000
         #print "changing bulb to %s" % dim[2]
         bulb.set_color(dim, half_period_ms, rapid=True)    
-    previous = 0   
-    #selecting options from menu  
-    arr = ['Attention', 'Meditation', 'Blink']
-    i = 0
-    j = 1
-    lcd_byte(LCD_LINE_1, LCD_CMD)
-    lcd_string('Select option',2)
-    lcd_byte(LCD_LINE_2, LCD_CMD)
-    lcd_string('Press any Button' ,2)
-    while GPIO.input(14)==GPIO.LOW and GPIO.input(15)==GPIO.LOW:
-        pass
-    time.sleep(1)
-    lcd_byte(LCD_LINE_1, LCD_CMD)
-    lcd_string("-->" + arr[i],2)
-    lcd_byte(LCD_LINE_2, LCD_CMD)
-    lcd_string(arr[j],2)
+    lightswitch = False
+    previous = []
+    
+    #no idea what this is for lol
+   # p = False 
+    
+    
+    prevAvg=0
+    count = 0
     while True:
-        #print "Attention: %s, Meditation: %s, previous: %s" % (headset.attention, headset.meditation,previous)
-        #scroll through options on the menu
-        if GPIO.input(15)== GPIO.HIGH:
-            print('Scrolling--------')
-            
-            i = (i+1)%3
-            j = (j+1)%3
-            lcd_byte(LCD_LINE_1, LCD_CMD)
-            lcd_string("-->" + arr[i],2)
-            lcd_byte(LCD_LINE_2, LCD_CMD)
-            lcd_string(arr[j],2)
-            while GPIO.input(15)== GPIO.HIGH:
-                pass
-    ##      lcd.GPIO.cleanup()
-        #select option
-        if GPIO.input(14)== GPIO.HIGH:
-            
-            selected = arr[i]
-            print ("Selected " + selected)
-            lightswitch = False
-            previous = []
-            p = False
-            prevAvg=0
-            count = 0
-            #if attention is selected
-            if i==0:
-                time.sleep(1)
-                lcd_byte(LCD_LINE_2, LCD_CMD)
-                lcd_string("Type end to Cont",2)
-                #Take user input for number of readings per output
-                avgSize =4
-                while True:
-                    lcd_byte(LCD_LINE_1, LCD_CMD)
-                    question = "Average Size: "+str(avgSize)
-                    lcd_string(question,2)
-                    text = raw_input("Average Size = ")
-                    if text == "end":
-                        break
-                    avgSize = int(text)
-                    
-                    
-                    
+            #This is for meditation        
+            time.sleep(1)                
+            #Take user input for number of readings per output
+            avgSize =4
+            while True:
+                question = "Average Size: "+str(avgSize)
+                print question
+                text = raw_input("Average Size = ")
+                if text == "end":
+                    break
+                avgSize = int(text)
 
-                lcd_byte(LCD_LINE_1, LCD_CMD)
-                lcd_string("Sel. Attention ",2)
+            time.sleep(1)
+            while True:                    
+                if count < avgSize-1:
+                    count+=1
+                    previous.append(headset.meditation)
+                    #for x in range(len(previous)): 
+                     #   print previous[x]
+                else:
+                    #p = False
+                    previous.append(headset.meditation)
+                    #for x in range(len(previous)): 
+                    #    print previous[x]
+                    k = 0
+                    sum = 0
+                    while k < avgSize:
+                        sum += previous[k]
+                        k+=1
+                    Avg = sum/len(previous)
+                    #print original_colors
+                    # max brightness of bulb goes from 0 to 65535 based on reverse of Avg. So closer to max meditation means dimmer bulb.
+                    # brightness in range [0 - 65535]
+                    # set_color is [Hue, Saturation, Brightness, Kelvin], duration in ms
+                    for bulb in original_colors:
+                        color = original_colors[bulb]
+                        dim = list(copy(color))
+                        #dim[2] = 655*(100-Avg)
+                        dim[0] = 62000-200*Avg
+                        #bulb.set_color(dim, 0, rapid=True)
+                        #print "changing bulb to %s" % dim[2]
+                        bulb.set_color(dim, half_period_ms, rapid=True)
+                    #time.sleep(half_period_ms/1000.0)
+                    previous = []
+                    count = 0
+                    print "Meditation: %s changing bulb to %s" % (Avg,dim[0])
+                    #switch light state if avg is more than 50 and prev is less than 50
+                    if Avg >= 50 and prevAvg < 50:
+                        if lightswitch == False :
+                            GPIO.output(17,GPIO.HIGH)
+                            lightswitch = True
+                        else:
+                            GPIO.output(17,GPIO.LOW)
+                            lightswitch = False
+                    prevAvg = Avg
                 time.sleep(1)
-                while True:                    
-                    if GPIO.input(14)==GPIO.HIGH:
-                        break
-                    if count < avgSize-1:
-                        count+=1
-                        previous.append(headset.attention)
-                        #for x in range(len(previous)): 
-                         #   print previous[x]
-                    else:
-                        #p = False
-                        previous.append(headset.attention)
-                        #for x in range(len(previous)): 
-                        #    print previous[x]
-                        k = 0
-                        sum = 0
-                        while k < avgSize:
-                            sum += previous[k]
-                            k+=1
-                        Avg = sum/len(previous)
-                        previous = []
-                        count = 0
-                        print "Attention: %s" % Avg
-                        #switch light state if avg is more than 50 and prev is less than 50
-                        if Avg >= 50 and prevAvg < 50:
-                            if lightswitch == False :
-                                GPIO.output(17,GPIO.HIGH)
-                                lightswitch = True
-                            else:
-                                GPIO.output(17,GPIO.LOW)
-                                lightswitch = False
-                        prevAvg = Avg
-                        lcd_byte(LCD_LINE_2, LCD_CMD)
-                        lcd_string(str(Avg),2)                      
-                    time.sleep(1)
-            #if meditation is selected
-            if i ==1:
-                time.sleep(1)                
-                lcd_byte(LCD_LINE_2, LCD_CMD)
-                lcd_string("Type end to Cont",2)
-                #Take user input for number of readings per output
-                avgSize =4
-                while True:
-                    lcd_byte(LCD_LINE_1, LCD_CMD)
-                    question = "Average Size: "+str(avgSize)
-                    lcd_string(question,2)
-                    text = raw_input("Average Size = ")
-                    if text == "end":
-                        break
-                    avgSize = int(text)
-
-                lcd_byte(LCD_LINE_1, LCD_CMD)
-                lcd_string("Sel. Meditation ",2)
-                time.sleep(1)
-                while True:                    
-                    if GPIO.input(14)==GPIO.HIGH:
-                        break
-                    if count < avgSize-1:
-                        count+=1
-                        previous.append(headset.meditation)
-                        #for x in range(len(previous)): 
-                         #   print previous[x]
-                    else:
-                        #p = False
-                        previous.append(headset.meditation)
-                        #for x in range(len(previous)): 
-                        #    print previous[x]
-                        k = 0
-                        sum = 0
-                        while k < avgSize:
-                            sum += previous[k]
-                            k+=1
-                        Avg = sum/len(previous)
-                        #print original_colors
-                        # max brightness of bulb goes from 0 to 65535 based on reverse of Avg. So closer to max meditation means dimmer bulb.
-                        # brightness in range [0 - 65535]
-                        # set_color is [Hue, Saturation, Brightness, Kelvin], duration in ms
-                        for bulb in original_colors:
-                            color = original_colors[bulb]
-                            dim = list(copy(color))
-                            #dim[2] = 655*(100-Avg)
-                            dim[0] = 62000-200*Avg
-                            #bulb.set_color(dim, 0, rapid=True)
-                            #print "changing bulb to %s" % dim[2]
-                            bulb.set_color(dim, half_period_ms, rapid=True)
-                        #time.sleep(half_period_ms/1000.0)
-                        previous = []
-                        count = 0
-                        print "Meditation: %s changing bulb to %s" % (Avg,dim[0])
-                        #switch light state if avg is more than 50 and prev is less than 50
-                        if Avg >= 50 and prevAvg < 50:
-                            if lightswitch == False :
-                                GPIO.output(17,GPIO.HIGH)
-                                lightswitch = True
-                            else:
-                                GPIO.output(17,GPIO.LOW)
-                                lightswitch = False
-                        prevAvg = Avg
-                        lcd_byte(LCD_LINE_2, LCD_CMD)
-                        lcd_string(str(Avg),2)                      
-                    time.sleep(1)
-            #if blink is selected
-            #blink doesnt work yet
-            if i == 2:
-                print('WORK IN PROGRESS')
-            lcd_byte(LCD_LINE_1, LCD_CMD)
-            lcd_string("-->" + arr[i],2)
-            lcd_byte(LCD_LINE_2, LCD_CMD)
-            lcd_string(arr[j],2)
-            GPIO.output(17,GPIO.LOW)
-            while GPIO.input(14)== GPIO.HIGH:
-                pass
         
 #initialization stuff
 def lcd_init():
